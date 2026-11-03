@@ -1,5 +1,7 @@
 import type { EpochMs } from '@gatemind/types';
 
+export type { SecretStore } from './secret-store';
+
 /** Time source port (ARC-055). Real implementations are injected; tests use a fake. */
 export interface Clock {
   nowMs(): EpochMs;

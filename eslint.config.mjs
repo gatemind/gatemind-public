@@ -85,5 +85,11 @@ export default [
       ],
     },
   },
+  {
+    // Test runner config files import the shared alias helper from the workspace root.
+    // They are tooling, not library code, so the boundary rule does not apply to them.
+    files: ['**/vitest.config.mjs'],
+    rules: { '@nx/enforce-module-boundaries': 'off' },
+  },
   prettier,
 ];

@@ -1,0 +1,8 @@
+{
+  "name": "core-config",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/config/src",
+  "projectType": "library",
+  "tags": ["scope:backend", "type:feature", "edition:core"],
+  "targets": { "lint": {}, "typecheck": {}, "test": {}, "build": {} }
+}

@@ -15,7 +15,8 @@
     "types": [],
     "paths": {
       "@gatemind/types": ["./libs/shared/types/src/index.ts"],
-      "@gatemind/ports": ["./libs/core/ports/src/index.ts"]
+      "@gatemind/ports": ["./libs/core/ports/src/index.ts"],
+      "@gatemind/config": ["./libs/core/config/src/index.ts"]
     }
   }
 }

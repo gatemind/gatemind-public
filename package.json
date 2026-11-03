@@ -25,6 +25,7 @@
     "@nx/eslint-plugin": "24.0.3",
     "@nx/js": "24.0.3",
     "@nx/vitest": "24.0.3",
+    "@types/node": "24.19.2",
     "@typescript-eslint/parser": "8.72.1",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
