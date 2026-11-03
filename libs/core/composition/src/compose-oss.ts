@@ -49,6 +49,11 @@ export const SETTING_NAMES = {
   queueStore: 'QUEUE_URL',
 } as const;
 
+/** Fixed dependency names used by the health endpoints. They are identifiers, not settings. */
+export const DEPENDENCY_NAMES = ['database', 'audit_database', 'cache', 'queue'] as const;
+export type DependencyName = (typeof DEPENDENCY_NAMES)[number];
+export type DependencyChecks = Readonly<Record<DependencyName, () => Promise<boolean>>>;
+
 export interface ComposeOssOptions {
   readonly secretStore: SecretStore;
   /** Injected for tests. Defaults to the system clock. */
@@ -83,6 +88,11 @@ export interface OssRuntime {
   readonly db: Database['db'];
   /** Can each Redis-compatible store answer right now? Never rejects (readiness, Story 1.7). */
   pingStores(): Promise<StorePing>;
+  /**
+   * One check per required dependency, for the readiness and health endpoints (REL-001, Story 1.7).
+   * Each answers `true` or `false`, never rejects and never says why. The names are fixed.
+   */
+  readonly dependencyChecks: DependencyChecks;
   /** Closes every connection. Safe to call twice. */
   close(): Promise<void>;
 }
@@ -159,6 +169,12 @@ export async function composeOss(options: ComposeOssOptions): Promise<OssRuntime
       storage: unconfiguredStoragePort,
       db: database.db,
       pingStores: () => store.ping(),
+      dependencyChecks: {
+        database: () => database.ping(),
+        audit_database: () => auditDatabase.ping(),
+        cache: async () => (await store.ping()).cache,
+        queue: async () => (await store.ping()).queue,
+      },
       async close() {
         if (closed) return;
         closed = true;

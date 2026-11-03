@@ -38,7 +38,28 @@ describe('loadConfig', () => {
     expect(config.mode).toBe('production');
     expect(config.logLevel).toBe('info');
     expect(config.httpPort).toBe(8080);
+    expect(config.shutdownGraceMs).toBe(30_000);
   });
+
+  it('reads the shutdown grace period in whole seconds', async () => {
+    const config = await load({
+      GATEMIND_MASTER_KEY: goodKey(),
+      GATEMIND_SHUTDOWN_GRACE_SECONDS: '5',
+    });
+    expect(config.shutdownGraceMs).toBe(5000);
+  });
+
+  it.each(['0', '601', '-1', '1.5', 'soon'])(
+    'refuses the shutdown grace period %s and names the setting',
+    async (value) => {
+      const problems = await problemsOf({
+        GATEMIND_MASTER_KEY: goodKey(),
+        GATEMIND_SHUTDOWN_GRACE_SECONDS: value,
+      });
+      expect(problems).toHaveLength(1);
+      expect(problems[0]).toContain('GATEMIND_SHUTDOWN_GRACE_SECONDS');
+    },
+  );
 
   it('refuses production start without a master key and names the setting', async () => {
     const problems = await problemsOf({ GATEMIND_ENV: 'production' });

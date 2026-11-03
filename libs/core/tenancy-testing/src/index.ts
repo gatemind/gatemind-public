@@ -4,6 +4,7 @@ export {
   openConnection,
   readDevDatabaseConfig,
 } from './dev-config';
+export { type DevStoreUrls, readDevStoreUrls } from './dev-stores';
 export {
   type CrossTenantOptions,
   type CrossTenantScenario,

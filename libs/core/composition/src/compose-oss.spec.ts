@@ -13,12 +13,11 @@ import {
 import { PortNotConfiguredError, type SecretStore } from '@gatemind/ports';
 import { RedisStoreError } from '@gatemind/redis-store';
 import { createTenantContext } from '@gatemind/tenancy';
-import { DEV_DATABASES, readDevDatabaseConfig } from '@gatemind/tenancy-testing';
+import { DEV_DATABASES, readDevDatabaseConfig, readDevStoreUrls } from '@gatemind/tenancy-testing';
 import { Secret, asTenantId } from '@gatemind/types';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { type OssRuntime, SETTING_NAMES, composeOss } from './compose-oss';
+import { DEPENDENCY_NAMES, type OssRuntime, SETTING_NAMES, composeOss } from './compose-oss';
 import { CompositionError } from './errors';
-import { readDevStoreUrls } from './dev-stores.test-support';
 
 const hex = (bytes = 4): string => randomBytes(bytes).toString('hex');
 const tenant = (label: string) => asTenantId(`${label}-${hex()}`);
@@ -196,6 +195,27 @@ describe('composeOss on the development stores', () => {
       .catch((e: unknown) => e);
     expect(error).toBeInstanceOf(AuditError);
     expect((error as AuditError).code).toBe('invalid_event');
+  });
+
+  it('reports every required dependency as up through dependencyChecks', async () => {
+    const other = await composeOss({ secretStore: storeWith(devSettings()) });
+    try {
+      expect(Object.keys(other.dependencyChecks)).toEqual([...DEPENDENCY_NAMES]);
+      for (const name of DEPENDENCY_NAMES) {
+        expect(await other.dependencyChecks[name](), name).toBe(true);
+      }
+    } finally {
+      await other.close();
+    }
+  });
+
+  it('reports every dependency as down, without rejecting, after close', async () => {
+    const other = await composeOss({ secretStore: storeWith(devSettings()) });
+    await other.close();
+    for (const name of DEPENDENCY_NAMES) {
+      const answer: unknown = await other.dependencyChecks[name]();
+      expect(answer, name).toBe(false);
+    }
   });
 
   it('closes cleanly, twice, and then reports the stores as unreachable', async () => {

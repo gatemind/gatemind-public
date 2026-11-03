@@ -17,6 +17,8 @@ export interface AppConfig {
   readonly mode: RuntimeMode;
   readonly logLevel: LogLevel;
   readonly httpPort: number;
+  /** How long in-flight requests may finish after a termination signal, in ms (REL-008). */
+  readonly shutdownGraceMs: number;
   /** Wrapped so it cannot leak through logs, JSON or inspect output (SEC-012). */
   readonly masterKey: Secret;
 }
@@ -64,6 +66,24 @@ function readPort(env: LoadConfigInput['env'], problems: string[]): number {
   return 8080;
 }
 
+export const DEFAULT_SHUTDOWN_GRACE_SECONDS = 30;
+export const MAX_SHUTDOWN_GRACE_SECONDS = 600;
+
+/** `GATEMIND_SHUTDOWN_GRACE_SECONDS` `[PROPOSED]`: whole seconds from 1 to 600, default 30. */
+function readShutdownGraceMs(env: LoadConfigInput['env'], problems: string[]): number {
+  const variable = `${ENV_PREFIX}SHUTDOWN_GRACE_SECONDS`;
+  const raw = env[variable]?.trim();
+  if (raw === undefined || raw === '') return DEFAULT_SHUTDOWN_GRACE_SECONDS * 1000;
+  if (/^\d+$/.test(raw)) {
+    const seconds = Number(raw);
+    if (seconds >= 1 && seconds <= MAX_SHUTDOWN_GRACE_SECONDS) return seconds * 1000;
+  }
+  problems.push(
+    `${variable} must be a whole number of seconds from 1 to ${MAX_SHUTDOWN_GRACE_SECONDS}`,
+  );
+  return DEFAULT_SHUTDOWN_GRACE_SECONDS * 1000;
+}
+
 /** Master key rule `[PROPOSED]`: base64 text that decodes to at least 32 bytes. */
 function isValidMasterKeyFormat(value: string): boolean {
   if (!/^[A-Za-z0-9+/_-]+={0,2}$/.test(value)) return false;
@@ -83,6 +103,7 @@ export async function loadConfig(input: LoadConfigInput): Promise<AppConfig> {
   const mode = readEnum(env, 'ENV', RUNTIME_MODES, 'production', problems);
   const logLevel = readEnum(env, 'LOG_LEVEL', LOG_LEVELS, 'info', problems);
   const httpPort = readPort(env, problems);
+  const shutdownGraceMs = readShutdownGraceMs(env, problems);
 
   let masterKey: Secret | undefined;
   try {
@@ -113,5 +134,5 @@ export async function loadConfig(input: LoadConfigInput): Promise<AppConfig> {
   if (problems.length > 0 || masterKey === undefined) {
     throw new ConfigError(problems);
   }
-  return { mode, logLevel, httpPort, masterKey };
+  return { mode, logLevel, httpPort, shutdownGraceMs, masterKey };
 }

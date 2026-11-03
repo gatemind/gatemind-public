@@ -10,6 +10,11 @@ export interface DatabaseOptions {
 
 export interface Database {
   readonly db: TenantDb;
+  /**
+   * Can the database answer right now? Never rejects and never reveals why it cannot: used by the
+   * readiness check (REL-001), whose response must not hold an address or an error text.
+   */
+  ping(): Promise<boolean>;
   close(): Promise<void>;
 }
 
@@ -50,6 +55,19 @@ export function createDatabase(options: DatabaseOptions): Database {
   });
   return {
     db: drizzle(pool, { mode: 'default' }) as unknown as TenantDb,
+    async ping() {
+      try {
+        const connection = await pool.getConnection();
+        try {
+          await connection.ping();
+          return true;
+        } finally {
+          connection.release();
+        }
+      } catch {
+        return false;
+      }
+    },
     close: () => pool.end(),
   };
 }

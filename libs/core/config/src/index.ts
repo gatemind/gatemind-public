@@ -1,9 +1,11 @@
 export {
   type AppConfig,
   ConfigError,
+  DEFAULT_SHUTDOWN_GRACE_SECONDS,
   LOG_LEVELS,
   type LoadConfigInput,
   type LogLevel,
+  MAX_SHUTDOWN_GRACE_SECONDS,
   MIN_MASTER_KEY_BYTES,
   RUNTIME_MODES,
   type RuntimeMode,

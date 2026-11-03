@@ -1,0 +1,15 @@
+{
+  "name": "server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/server/src",
+  "projectType": "application",
+  "tags": ["scope:backend", "type:app", "edition:core"],
+  "targets": {
+    "lint": {},
+    "typecheck": {},
+    "test": {
+      "dependsOn": ["core-composition:test"]
+    },
+    "build": {}
+  }
+}
