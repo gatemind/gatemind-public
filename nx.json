@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": ["{workspaceRoot}/tsconfig.base.json", "{workspaceRoot}/eslint.config.mjs"]
+  },
+  "targetDefaults": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "options": {
+        "command": "eslint {projectRoot}"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "options": {
+        "commands": [
+          "tsc -p {projectRoot}/tsconfig.lib.json --noEmit",
+          "tsc -p {projectRoot}/tsconfig.spec.json --noEmit"
+        ],
+        "parallel": false
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "options": {
+        "command": "vitest run --root {projectRoot} --passWithNoTests"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["default", "^default"],
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "command": "tsc -p {projectRoot}/tsconfig.lib.json --rootDir . --outDir dist"
+      }
+    }
+  }
+}

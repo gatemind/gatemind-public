@@ -1,0 +1,5 @@
+node_modules
+dist
+coverage
+.nx
+package-lock.json

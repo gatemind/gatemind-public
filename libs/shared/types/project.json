@@ -1,0 +1,8 @@
+{
+  "name": "shared-types",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/types/src",
+  "projectType": "library",
+  "tags": ["scope:shared", "type:util", "edition:core"],
+  "targets": { "lint": {}, "typecheck": {}, "test": {}, "build": {} }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "gatemind",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "Gatemind core workspace. All rights reserved, license pending.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "nx run-many -t lint",
+    "typecheck": "nx run-many -t typecheck",
+    "test": "nx run-many -t test",
+    "build": "nx run-many -t build",
+    "check:boundaries": "node tools/boundary-check/check.mjs",
+    "check:tags": "node tools/tag-check/check.mjs",
+    "check:oss-only": "node tools/oss-only-check/check.mjs",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:boundaries && npm run check:tags && npm run check:oss-only"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@nx/eslint": "24.0.3",
+    "@nx/eslint-plugin": "24.0.3",
+    "@nx/js": "24.0.3",
+    "@nx/vitest": "24.0.3",
+    "@typescript-eslint/parser": "8.72.1",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "nx": "24.0.3",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.1.0"
+  }
+}
