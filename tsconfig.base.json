@@ -20,7 +20,8 @@
       "@gatemind/tenancy": ["./libs/core/tenancy/src/index.ts"],
       "@gatemind/database": ["./libs/core/database/src/index.ts"],
       "@gatemind/tenancy-testing": ["./libs/core/tenancy-testing/src/index.ts"],
-      "@gatemind/secrets": ["./libs/core/secrets/src/index.ts"]
+      "@gatemind/secrets": ["./libs/core/secrets/src/index.ts"],
+      "@gatemind/audit": ["./libs/core/audit/src/index.ts"]
     }
   }
 }

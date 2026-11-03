@@ -42,6 +42,9 @@ if (command === 'up') {
     console.log('Created infrastructure/dev/.env with random passwords (not committed).');
   }
   compose('up', '-d', '--wait');
+  // The init script only runs for an empty data directory. It is idempotent, so run it again to
+  // give an existing container the databases and grants added by later stories.
+  compose('exec', '-T', 'mysql', 'sh', '/docker-entrypoint-initdb.d/10-users-and-databases.sh');
   console.log('MySQL is healthy on 127.0.0.1 (port from GATEMIND_DB_PORT, default 3307).');
 } else if (command === 'down') {
   if (existsSync(envFile)) compose('down');

@@ -1,0 +1,15 @@
+{
+  "name": "core-audit",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/audit/src",
+  "projectType": "library",
+  "tags": ["scope:backend", "type:feature", "edition:core"],
+  "targets": {
+    "lint": {},
+    "typecheck": {},
+    "test": {
+      "dependsOn": ["core-database:test"]
+    },
+    "build": {}
+  }
+}

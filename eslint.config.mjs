@@ -156,6 +156,12 @@ export default [
     rules: { 'no-restricted-imports': 'off', 'no-restricted-syntax': 'off' },
   },
   {
+    // The audit log's MySQL test alters, deletes and reorders rows with raw SQL on purpose, to
+    // prove the verifier notices what someone with direct database access could do (Story 1.6).
+    files: ['libs/core/audit/src/**/*.mysql.spec.ts'],
+    rules: { 'no-restricted-imports': 'off', 'no-restricted-syntax': 'off' },
+  },
+  {
     // Test runner config files import the shared alias helper from the workspace root.
     // They are tooling, not library code, so the boundary rule does not apply to them.
     files: ['**/vitest.config.mjs'],

@@ -1,4 +1,11 @@
-export { checkCoreSchema } from './check-schema';
+export { AUDIT_MIGRATIONS_TABLE, auditLog } from './audit/audit-log-schema';
+export { type AuditListOptions, AuditLogStore, type AuditLogRow } from './audit/audit-log-store';
+export {
+  AUDIT_MIGRATIONS_FOLDER,
+  type RunAuditMigrationsOptions,
+  runAuditMigrations,
+} from './audit/migrate-audit';
+export { checkAuditSchema, checkCoreSchema } from './check-schema';
 export {
   type Database,
   type DatabaseOptions,

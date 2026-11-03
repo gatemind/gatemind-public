@@ -23,7 +23,9 @@
     "db:up": "node tools/dev-db/dev-db.mjs up",
     "db:down": "node tools/dev-db/dev-db.mjs down",
     "db:reset": "node tools/dev-db/dev-db.mjs reset",
-    "db:generate": "drizzle-kit generate --config libs/core/database/drizzle.config.ts"
+    "db:generate": "drizzle-kit generate --config libs/core/database/drizzle.config.ts",
+    "db:generate:audit": "drizzle-kit generate --config libs/core/database/drizzle.audit.config.ts",
+    "audit:verify": "tsx --tsconfig tsconfig.base.json libs/core/audit/src/bin.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -38,6 +40,7 @@
     "eslint-config-prettier": "10.1.8",
     "nx": "24.0.3",
     "prettier": "3.9.10",
+    "tsx": "4.23.15",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.1",
     "vitest": "5.1.0"

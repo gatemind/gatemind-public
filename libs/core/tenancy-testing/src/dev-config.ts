@@ -9,6 +9,8 @@ export const DEV_DATABASES = {
   test: 'gatemind_test',
   /** Cross-tenant harness fixtures and deliberately bad tables. */
   probe: 'gatemind_probe',
+  /** Audit log tests (Story 1.6): the application user may only SELECT and INSERT here. */
+  auditTest: 'gatemind_audit_test',
 } as const;
 
 export interface DevDatabaseConfig {

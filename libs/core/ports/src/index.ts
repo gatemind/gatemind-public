@@ -1,5 +1,6 @@
 import type { EpochMs } from '@gatemind/types';
 
+export type { AuditEvent, AuditReceipt, AuditSink } from './audit-sink';
 export type { KeyManagement } from './key-management';
 export type { SecretStore } from './secret-store';
 
