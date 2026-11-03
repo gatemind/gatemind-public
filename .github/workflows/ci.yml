@@ -39,6 +39,8 @@ jobs:
       - run: npm run check:tags
       # Proves the raw-SQL lint rule fires on deliberate violations (ARC-020).
       - run: npm run check:raw-sql
+      # Proves only libs/core/redis-store may import a Redis-compatible client (ARC-055, ADR 0003).
+      - run: npm run check:redis-import
 
   oss-only:
     name: OSS-only build and test (no ee code present)

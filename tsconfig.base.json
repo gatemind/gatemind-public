@@ -21,7 +21,9 @@
       "@gatemind/database": ["./libs/core/database/src/index.ts"],
       "@gatemind/tenancy-testing": ["./libs/core/tenancy-testing/src/index.ts"],
       "@gatemind/secrets": ["./libs/core/secrets/src/index.ts"],
-      "@gatemind/audit": ["./libs/core/audit/src/index.ts"]
+      "@gatemind/audit": ["./libs/core/audit/src/index.ts"],
+      "@gatemind/redis-store": ["./libs/core/redis-store/src/index.ts"],
+      "@gatemind/composition": ["./libs/core/composition/src/index.ts"]
     }
   }
 }

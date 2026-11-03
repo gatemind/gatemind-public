@@ -1,6 +1,7 @@
-# Development and CI database only (ADR 0001, ADR 0003).
+# Development and CI services only (ADR 0001, ADR 0003).
 # NOT for distribution: the MySQL Community license and image terms (LIC-011) are not yet
-# recorded in ADR 0001. Story 1.8 builds the real Compose profile after that gate.
+# recorded in ADR 0001, and the Valkey image has not passed the ADR 0003 gates (license scan and
+# BullMQ compatibility test). Story 1.8 builds the real Compose profile after those gates.
 # Passwords come from infrastructure/dev/.env, which `npm run db:up` generates with random values.
 name: gatemind
 
@@ -23,5 +24,44 @@ services:
       timeout: 3s
       retries: 40
 
+  # Cache, rate-limit counters and pub/sub (CachePort, RateLimiterPort). May evict (ADR 0003).
+  valkey-cache:
+    image: valkey/valkey:9@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7
+    restart: unless-stopped
+    environment:
+      REDISCLI_AUTH: ${GATEMIND_CACHE_PASSWORD:?run npm run db:up}
+    command:
+      - sh
+      - -c
+      - exec valkey-server --requirepass "$$REDISCLI_AUTH" --maxmemory 128mb --maxmemory-policy allkeys-lru --save "" --appendonly no
+    ports:
+      - '127.0.0.1:${GATEMIND_CACHE_PORT:-6380}:6379'
+    healthcheck:
+      test: ['CMD-SHELL', 'valkey-cli --no-auth-warning -a "$$REDISCLI_AUTH" ping | grep -q PONG']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  # BullMQ queues (QueuePort). Separate from the cache and never evicts (SEC-022, ADR 0003).
+  valkey-queue:
+    image: valkey/valkey:9@sha256:3add1a336a920ea54770a001ab6feb3da5fceea96a40373a3a2cd469b815f0b7
+    restart: unless-stopped
+    environment:
+      REDISCLI_AUTH: ${GATEMIND_QUEUE_PASSWORD:?run npm run db:up}
+    command:
+      - sh
+      - -c
+      - exec valkey-server --requirepass "$$REDISCLI_AUTH" --maxmemory-policy noeviction --appendonly yes
+    ports:
+      - '127.0.0.1:${GATEMIND_QUEUE_PORT:-6381}:6379'
+    volumes:
+      - gatemind-dev-valkey-queue:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'valkey-cli --no-auth-warning -a "$$REDISCLI_AUTH" ping | grep -q PONG']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
 volumes:
   gatemind-dev-mysql:
+  gatemind-dev-valkey-queue:

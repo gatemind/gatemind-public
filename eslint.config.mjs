@@ -1,6 +1,53 @@
 import nx from '@nx/eslint-plugin';
 import prettier from 'eslint-config-prettier';
 
+const MYSQL_MESSAGE =
+  'Raw database access is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.';
+const REDIS_MESSAGE =
+  'Redis-compatible store clients are only allowed in libs/core/redis-store (ARC-055, ADR 0003). Use CachePort, QueuePort or RateLimiterPort.';
+
+// Import restrictions are built from named sets, because a flat-config override replaces the whole
+// rule: each override states which sets still apply to it.
+const mysqlImports = {
+  paths: [
+    { name: 'mysql2', message: MYSQL_MESSAGE },
+    {
+      name: 'drizzle-orm',
+      importNames: ['sql'],
+      message:
+        'Raw SQL is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
+    },
+  ],
+  patterns: [
+    {
+      group: [
+        'mysql2/*',
+        'drizzle-orm/mysql2',
+        'drizzle-orm/mysql2/*',
+        'drizzle-orm/mysql-core',
+        'drizzle-orm/mysql-core/*',
+      ],
+      message: MYSQL_MESSAGE,
+    },
+  ],
+};
+const redisImports = {
+  paths: ['ioredis', 'bullmq', 'redis', 'iovalkey', '@redis/client'].map((name) => ({
+    name,
+    message: REDIS_MESSAGE,
+  })),
+  patterns: [
+    {
+      group: ['ioredis/*', 'bullmq/*', 'redis/*', 'iovalkey/*', '@redis/*', '@valkey/*'],
+      message: REDIS_MESSAGE,
+    },
+  ],
+};
+const restrictImports = (...sets) => [
+  'error',
+  { paths: sets.flatMap((set) => set.paths), patterns: sets.flatMap((set) => set.patterns) },
+];
+
 // Tag taxonomy and constraints: master.md ARC-056 [PROPOSED], ARC-030.
 // scope: backend | frontend | shared | tooling
 // type:  app | feature | data-access | ui | util | port | adapter
@@ -92,37 +139,7 @@ export default [
     // `tools/raw-sql-check` proves this rule fires on a deliberate violation.
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.mjs'],
     rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: 'mysql2',
-              message:
-                'Raw database access is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
-            },
-            {
-              name: 'drizzle-orm',
-              importNames: ['sql'],
-              message:
-                'Raw SQL is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
-            },
-          ],
-          patterns: [
-            {
-              group: [
-                'mysql2/*',
-                'drizzle-orm/mysql2',
-                'drizzle-orm/mysql2/*',
-                'drizzle-orm/mysql-core',
-                'drizzle-orm/mysql-core/*',
-              ],
-              message:
-                'Raw database access is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
-            },
-          ],
-        },
-      ],
+      'no-restricted-imports': restrictImports(mysqlImports, redisImports),
       'no-restricted-syntax': [
         'error',
         {
@@ -153,13 +170,26 @@ export default [
     // The data layer itself: the repository base, the database library (connection, migrations,
     // schema introspection) and the test support that attacks them against a real MySQL.
     files: ['libs/core/tenancy/**', 'libs/core/database/**', 'libs/core/tenancy-testing/**'],
-    rules: { 'no-restricted-imports': 'off', 'no-restricted-syntax': 'off' },
+    rules: {
+      'no-restricted-imports': restrictImports(redisImports),
+      'no-restricted-syntax': 'off',
+    },
   },
   {
     // The audit log's MySQL test alters, deletes and reorders rows with raw SQL on purpose, to
     // prove the verifier notices what someone with direct database access could do (Story 1.6).
     files: ['libs/core/audit/src/**/*.mysql.spec.ts'],
-    rules: { 'no-restricted-imports': 'off', 'no-restricted-syntax': 'off' },
+    rules: {
+      'no-restricted-imports': restrictImports(redisImports),
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    // The Redis-compatible store adapter is the only code that imports a store client (ARC-055,
+    // ADR 0003). It must never reach the database.
+    // `tools/redis-import-check` proves this rule fires on deliberate violations.
+    files: ['libs/core/redis-store/**'],
+    rules: { 'no-restricted-imports': restrictImports(mysqlImports) },
   },
   {
     // Test runner config files import the shared alias helper from the workspace root.

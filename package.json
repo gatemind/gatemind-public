@@ -18,8 +18,9 @@
     "check:tags": "node tools/tag-check/check.mjs",
     "check:oss-only": "node tools/oss-only-check/check.mjs",
     "check:raw-sql": "node tools/raw-sql-check/check.mjs",
+    "check:redis-import": "node tools/redis-import-check/check.mjs",
     "check:schema": "vitest run --root libs/core/database src/core-schema.spec.ts",
-    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:boundaries && npm run check:tags && npm run check:raw-sql && npm run check:oss-only",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:boundaries && npm run check:tags && npm run check:raw-sql && npm run check:redis-import && npm run check:oss-only",
     "db:up": "node tools/dev-db/dev-db.mjs up",
     "db:down": "node tools/dev-db/dev-db.mjs down",
     "db:reset": "node tools/dev-db/dev-db.mjs reset",
@@ -46,7 +47,9 @@
     "vitest": "5.1.0"
   },
   "dependencies": {
+    "bullmq": "6.5.4",
     "drizzle-orm": "0.45.4",
+    "ioredis": "6.0.0",
     "mysql2": "3.24.6"
   }
 }

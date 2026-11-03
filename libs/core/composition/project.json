@@ -1,0 +1,15 @@
+{
+  "name": "core-composition",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/composition/src",
+  "projectType": "library",
+  "tags": ["scope:backend", "type:feature", "edition:core"],
+  "targets": {
+    "lint": {},
+    "typecheck": {},
+    "test": {
+      "dependsOn": ["core-database:test", "core-secrets:test", "core-audit:test"]
+    },
+    "build": {}
+  }
+}

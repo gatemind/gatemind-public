@@ -1,0 +1,8 @@
+{
+  "name": "core-redis-store",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/redis-store/src",
+  "projectType": "library",
+  "tags": ["scope:backend", "type:adapter", "edition:core"],
+  "targets": { "lint": {}, "typecheck": {}, "test": {}, "build": {} }
+}
