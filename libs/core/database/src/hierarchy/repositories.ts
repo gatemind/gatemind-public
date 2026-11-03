@@ -25,6 +25,12 @@ export class OrganizationRepository {
     return rows[0];
   }
 
+  /** Ids of every organization. Used by instance-level jobs such as master key rotation. */
+  async listIds(): Promise<string[]> {
+    const rows = await this.db.select({ id: organizations.id }).from(organizations);
+    return rows.map((row) => row.id);
+  }
+
   async insert(values: NewOrganization): Promise<void> {
     await this.db.insert(organizations).values(values);
   }

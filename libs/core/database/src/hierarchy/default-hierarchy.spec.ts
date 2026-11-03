@@ -36,7 +36,7 @@ let appConnection: Connection;
 let app: Database;
 
 async function wipeHierarchy(): Promise<void> {
-  for (const table of ['environments', 'projects', 'workspaces', 'organizations']) {
+  for (const table of ['tenant_keys', 'environments', 'projects', 'workspaces', 'organizations']) {
     await migrator.query(`DELETE FROM ${table}`);
   }
 }
@@ -176,14 +176,20 @@ describe('the organization is the only tenant boundary (ARC-024)', () => {
     expect(Object.keys(NON_TENANT_TABLES)).toEqual(['organizations']);
   });
 
-  it('has workspaces, projects and environments in the core schema as tenant-owned tables', () => {
+  it('has the hierarchy tables and the tenant keys (Story 1.5) in the core schema as tenant-owned tables', () => {
     expect(Object.keys(coreSchema).sort()).toEqual([
       'environments',
       'organizations',
       'projects',
+      'tenantKeys',
       'workspaces',
     ]);
-    for (const table of [coreSchema.workspaces, coreSchema.projects, coreSchema.environments]) {
+    for (const table of [
+      coreSchema.workspaces,
+      coreSchema.projects,
+      coreSchema.environments,
+      coreSchema.tenantKeys,
+    ]) {
       expect(Object.keys(table)).toContain('tenantId');
     }
   });

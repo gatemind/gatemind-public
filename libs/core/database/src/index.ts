@@ -5,7 +5,17 @@ export {
   createDatabase,
   parseDatabaseUrl,
 } from './connection';
+export { isDuplicateKeyError, mysqlErrno } from './db-errors';
 export { describeMysqlSchema } from './introspect';
+export {
+  ACTIVE_KEY_STATUS,
+  type StoredTenantKey,
+  TenantKeyRepository,
+  TenantKeyStore,
+  type TenantKeyStores,
+  createTenantKeyStores,
+  tenantKeyId,
+} from './tenant-key-store';
 export {
   DEFAULT_ENVIRONMENT_ID,
   DEFAULT_ENVIRONMENT_NAME,
@@ -40,6 +50,7 @@ export {
   environments,
   organizations,
   projects,
+  tenantKeys,
   workspaces,
 } from './schema';
 export type {

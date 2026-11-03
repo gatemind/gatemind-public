@@ -1,12 +1,19 @@
 import { environments } from './environments';
 import { organizations } from './organizations';
 import { projects } from './projects';
+import { tenantKeys } from './tenant-keys';
 import { workspaces } from './workspaces';
 
-export { environments, organizations, projects, workspaces };
+export { environments, organizations, projects, tenantKeys, workspaces };
 
 /** Every table of the core schema (ARC-052). Tables of any other edition never appear here. */
-export const coreSchema = { organizations, workspaces, projects, environments } as const;
+export const coreSchema = {
+  organizations,
+  workspaces,
+  projects,
+  environments,
+  tenantKeys,
+} as const;
 
 /** Name of the core migration journal table, separate from any ee journal (ARC-052). */
 export const CORE_MIGRATIONS_TABLE = '__core_migrations';

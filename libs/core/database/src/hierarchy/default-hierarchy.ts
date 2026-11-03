@@ -4,6 +4,7 @@ import {
   createScopeContext,
   createTenantContext,
 } from '@gatemind/tenancy';
+import { isDuplicateKeyError } from '../db-errors';
 import {
   EnvironmentRepository,
   OrganizationRepository,
@@ -29,7 +30,6 @@ export const DEFAULT_ENVIRONMENT_NAME = 'Default environment';
 export const DEFAULT_REGION = 'local';
 
 const REGION_PATTERN = /^[a-z0-9][a-z0-9-]{0,31}$/;
-const ER_DUP_ENTRY = 1062;
 
 export interface EnsureDefaultHierarchyOptions {
   /** 1 to 32 characters: lowercase letters, digits, "-". Ignored when the organization exists. */
@@ -42,16 +42,6 @@ export interface DefaultHierarchy {
   readonly region: string;
   /** True when this call created at least one row. Informational only (concurrent starts). */
   readonly created: boolean;
-}
-
-function errnoOf(error: unknown): number | undefined {
-  let current: unknown = error;
-  for (let depth = 0; depth < 4 && typeof current === 'object' && current !== null; depth += 1) {
-    const { errno, cause } = current as { errno?: unknown; cause?: unknown };
-    if (typeof errno === 'number') return errno;
-    current = cause;
-  }
-  return undefined;
 }
 
 /**
@@ -68,7 +58,7 @@ async function ensureRow(
     await insert();
     return true;
   } catch (error) {
-    if (errnoOf(error) !== ER_DUP_ENTRY || (await find()) === undefined) throw error;
+    if (!isDuplicateKeyError(error) || (await find()) === undefined) throw error;
     return false;
   }
 }
