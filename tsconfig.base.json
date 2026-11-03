@@ -16,7 +16,10 @@
     "paths": {
       "@gatemind/types": ["./libs/shared/types/src/index.ts"],
       "@gatemind/ports": ["./libs/core/ports/src/index.ts"],
-      "@gatemind/config": ["./libs/core/config/src/index.ts"]
+      "@gatemind/config": ["./libs/core/config/src/index.ts"],
+      "@gatemind/tenancy": ["./libs/core/tenancy/src/index.ts"],
+      "@gatemind/database": ["./libs/core/database/src/index.ts"],
+      "@gatemind/tenancy-testing": ["./libs/core/tenancy-testing/src/index.ts"]
     }
   }
 }

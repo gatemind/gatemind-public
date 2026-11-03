@@ -86,6 +86,76 @@ export default [
     },
   },
   {
+    // ARC-020, ADR 0001 control 1: the tenant-scoped repository is the only data path. Outside
+    // the data layer (below), code may not open a database connection, use the MySQL driver or
+    // raw Drizzle table definitions, build raw SQL, or write SQL statements as strings.
+    // `tools/raw-sql-check` proves this rule fires on a deliberate violation.
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.mjs'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'mysql2',
+              message:
+                'Raw database access is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
+            },
+            {
+              name: 'drizzle-orm',
+              importNames: ['sql'],
+              message:
+                'Raw SQL is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
+            },
+          ],
+          patterns: [
+            {
+              group: [
+                'mysql2/*',
+                'drizzle-orm/mysql2',
+                'drizzle-orm/mysql2/*',
+                'drizzle-orm/mysql-core',
+                'drizzle-orm/mysql-core/*',
+              ],
+              message:
+                'Raw database access is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
+            },
+          ],
+        },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "TaggedTemplateExpression[tag.name='sql']",
+          message:
+            'Raw SQL is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
+        },
+        {
+          selector:
+            'CallExpression[callee.property.name=/^(query|execute)$/][arguments.0.type=/^(Literal|TemplateLiteral)$/]',
+          message:
+            'Raw SQL is only allowed in the data layer (ARC-020). Use a tenant-scoped repository.',
+        },
+        {
+          selector:
+            'Literal[value=/^\\s*(select\\s[^;]*\\sfrom\\s|insert\\s+into\\s|update\\s+\\w+\\s+set\\s|delete\\s+from\\s)/i]',
+          message: 'SQL statements as strings are only allowed in the data layer (ARC-020).',
+        },
+        {
+          selector:
+            'TemplateElement[value.raw=/^\\s*(select\\s[^;]*\\sfrom\\s|insert\\s+into\\s|update\\s+\\w+\\s+set\\s|delete\\s+from\\s)/i]',
+          message: 'SQL statements as strings are only allowed in the data layer (ARC-020).',
+        },
+      ],
+    },
+  },
+  {
+    // The data layer itself: the repository base, the database library (connection, migrations,
+    // schema introspection) and the test support that attacks them against a real MySQL.
+    files: ['libs/core/tenancy/**', 'libs/core/database/**', 'libs/core/tenancy-testing/**'],
+    rules: { 'no-restricted-imports': 'off', 'no-restricted-syntax': 'off' },
+  },
+  {
     // Test runner config files import the shared alias helper from the workspace root.
     // They are tooling, not library code, so the boundary rule does not apply to them.
     files: ['**/vitest.config.mjs'],

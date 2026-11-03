@@ -14,8 +14,12 @@ Requires Node.js 22 or newer (`.nvmrc` pins the version used in CI).
 
 ```bash
 npm ci
+npm run db:up      # starts MySQL 9.7 in Docker (development only), creates a random-password .env
 npm run verify
 ```
 
+The data-layer tests run against a real MySQL, so Docker is needed. `npm run db:down` stops the
+database and `npm run db:reset` deletes its data.
+
 `npm run verify` runs the same checks as CI: format, lint, strict type check, tests, build, the
-module-boundary guard, the project tag check and the OSS-only check.
+module-boundary guard, the project tag check, the raw-SQL lint guard and the OSS-only check.

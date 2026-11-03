@@ -35,3 +35,25 @@ export class Secret {
     return REDACTED;
   }
 }
+
+/**
+ * Identifier of the top-level isolation unit, the organization (ARC-024).
+ * The format is deliberately narrow so a tenant id is always safe inside cache keys, queue job
+ * names, file paths and log fields (ARC-023): no separators, no whitespace, at most 64 characters.
+ */
+export type TenantId = Brand<string, 'TenantId'>;
+
+const TENANT_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
+
+export function isTenantId(value: unknown): value is TenantId {
+  return typeof value === 'string' && TENANT_ID_PATTERN.test(value);
+}
+
+export function asTenantId(value: string): TenantId {
+  if (!isTenantId(value)) {
+    throw new TypeError(
+      'Invalid tenant id: use 1 to 64 letters, digits, "_" or "-", starting with a letter or digit',
+    );
+  }
+  return value;
+}

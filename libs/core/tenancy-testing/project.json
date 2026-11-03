@@ -1,0 +1,8 @@
+{
+  "name": "core-tenancy-testing",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/tenancy-testing/src",
+  "projectType": "library",
+  "tags": ["scope:backend", "type:data-access", "edition:core"],
+  "targets": { "lint": {}, "typecheck": {}, "test": {}, "build": {} }
+}

@@ -17,7 +17,13 @@
     "check:boundaries": "node tools/boundary-check/check.mjs",
     "check:tags": "node tools/tag-check/check.mjs",
     "check:oss-only": "node tools/oss-only-check/check.mjs",
-    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:boundaries && npm run check:tags && npm run check:oss-only"
+    "check:raw-sql": "node tools/raw-sql-check/check.mjs",
+    "check:schema": "vitest run --root libs/core/database src/core-schema.spec.ts",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build && npm run check:boundaries && npm run check:tags && npm run check:raw-sql && npm run check:oss-only",
+    "db:up": "node tools/dev-db/dev-db.mjs up",
+    "db:down": "node tools/dev-db/dev-db.mjs down",
+    "db:reset": "node tools/dev-db/dev-db.mjs reset",
+    "db:generate": "drizzle-kit generate --config libs/core/database/drizzle.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -27,6 +33,7 @@
     "@nx/vitest": "24.0.3",
     "@types/node": "24.19.2",
     "@typescript-eslint/parser": "8.72.1",
+    "drizzle-kit": "0.31.11",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
     "nx": "24.0.3",
@@ -34,5 +41,9 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.1",
     "vitest": "5.1.0"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.4",
+    "mysql2": "3.24.6"
   }
 }

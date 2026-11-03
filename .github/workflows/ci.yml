@@ -29,11 +29,16 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
+      # The data-layer suites run against a real MySQL 9.7 (ADR 0001): migrations, the tenant-rules
+      # check, database privileges and the cross-tenant harness. Passwords are random per run.
+      - run: npm run db:up
       - run: npm run test
       - run: npm run build
       # Proves the module-boundary rule fires on a deliberate violation (ARC-030, ARC-056).
       - run: npm run check:boundaries
       - run: npm run check:tags
+      # Proves the raw-SQL lint rule fires on deliberate violations (ARC-020).
+      - run: npm run check:raw-sql
 
   oss-only:
     name: OSS-only build and test (no ee code present)
@@ -50,6 +55,9 @@ jobs:
       - run: npm ci
       - run: npm run check:oss-only
       - run: npm run build
+      # The data-layer suites run against a real MySQL 9.7 (ADR 0001): migrations, the tenant-rules
+      # check, database privileges and the cross-tenant harness. Passwords are random per run.
+      - run: npm run db:up
       - run: npm run test
 
   dependency-scan:

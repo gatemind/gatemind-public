@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1793704950200,
+      "tag": "0000_tough_beyonder",
+      "breakpoints": true
+    }
+  ]
+}

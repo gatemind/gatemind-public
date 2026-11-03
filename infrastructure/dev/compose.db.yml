@@ -1,0 +1,27 @@
+# Development and CI database only (ADR 0001, ADR 0003).
+# NOT for distribution: the MySQL Community license and image terms (LIC-011) are not yet
+# recorded in ADR 0001. Story 1.8 builds the real Compose profile after that gate.
+# Passwords come from infrastructure/dev/.env, which `npm run db:up` generates with random values.
+name: gatemind
+
+services:
+  mysql:
+    image: mysql:9.7@sha256:df90258da46f6e7ff8574ff84f17618aba0765cac749928299c69fd4e7cb8ad8
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${GATEMIND_DB_ROOT_PASSWORD:?run npm run db:up}
+      GATEMIND_DB_APP_PASSWORD: ${GATEMIND_DB_APP_PASSWORD:?run npm run db:up}
+      GATEMIND_DB_MIGRATOR_PASSWORD: ${GATEMIND_DB_MIGRATOR_PASSWORD:?run npm run db:up}
+    ports:
+      - '127.0.0.1:${GATEMIND_DB_PORT:-3307}:3306'
+    volumes:
+      - gatemind-dev-mysql:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 -uroot -p"$$MYSQL_ROOT_PASSWORD" --silent']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+volumes:
+  gatemind-dev-mysql:
