@@ -24,8 +24,14 @@ async function tableNames(): Promise<string[]> {
 }
 
 async function dropEverything(): Promise<void> {
-  for (const name of await tableNames()) {
-    await migrator.query(`DROP TABLE IF EXISTS \`${name}\``);
+  // The hierarchy tables reference each other, so a parent cannot be dropped first.
+  await migrator.query('SET FOREIGN_KEY_CHECKS = 0');
+  try {
+    for (const name of await tableNames()) {
+      await migrator.query(`DROP TABLE IF EXISTS \`${name}\``);
+    }
+  } finally {
+    await migrator.query('SET FOREIGN_KEY_CHECKS = 1');
   }
 }
 

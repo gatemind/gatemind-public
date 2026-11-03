@@ -8,6 +8,13 @@
       "when": 1793704950200,
       "tag": "0000_tough_beyonder",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1793706507016,
+      "tag": "0001_chilly_black_cat",
+      "breakpoints": true
     }
   ]
 }

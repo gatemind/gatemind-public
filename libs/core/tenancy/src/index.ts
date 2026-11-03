@@ -1,5 +1,11 @@
 export { TenantIsolationError } from './errors';
-export { type TenantContext, createTenantContext } from './tenant-context';
+export {
+  type ScopeContext,
+  type ScopeIds,
+  type TenantContext,
+  createScopeContext,
+  createTenantContext,
+} from './tenant-context';
 export {
   tenantCacheKey,
   tenantLogFields,
